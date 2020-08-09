@@ -1,6 +1,7 @@
 package com.seepine.http.util;
 
 import com.seepine.http.entity.Request;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -35,13 +36,13 @@ public class UrlUtil {
                 return abs.toExternalForm();
             }
             // workaround: java resolves '//path/file + ?foo' to '//path/?foo', not '//path/file?foo' as desired
-            if (url.startsWith("?")) {
+            if (url.startsWith(StrUtil.QUESTION_MARK)) {
                 url = base.getPath() + url;
             }
             URL abs = new URL(base, url);
             return abs.toExternalForm();
         } catch (MalformedURLException e) {
-            return "";
+            return StrUtil.EMPTY;
         }
     }
 
@@ -54,6 +55,10 @@ public class UrlUtil {
         return url.replace(" ", "%20");
     }
 
+    /**
+     * @param url url
+     * @return String
+     */
     public static String fixIllegalCharacterInUrl(String url) {
         //TODO more charator support
         return url.replace(" ", "%20").replaceAll("#+", "#");
@@ -99,10 +104,10 @@ public class UrlUtil {
         return urlList;
     }
 
-    private static final Pattern patternForCharset = Pattern.compile("charset\\s*=\\s*['\"]*([^\\s;'\"]*)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATTERN_FOR_CHARSET = Pattern.compile("charset\\s*=\\s*['\"]*([^\\s;'\"]*)", Pattern.CASE_INSENSITIVE);
 
     public static String getCharset(String contentType) {
-        Matcher matcher = patternForCharset.matcher(contentType);
+        Matcher matcher = PATTERN_FOR_CHARSET.matcher(contentType);
         if (matcher.find()) {
             String charset = matcher.group(1);
             if (Charset.isSupported(charset)) {

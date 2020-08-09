@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @param <T>
+ * @param <T> t
  * @author Seepine
  */
 @Setter
 @Getter
 @SuppressWarnings("unchecked")
-public abstract class HttpBase<T> implements Serializable {
+public abstract class BaseHttp<T> implements Serializable {
     private static final long serialVersionUID = 2062192774891352043L;
     /**
      * 存储头信息

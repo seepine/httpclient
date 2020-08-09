@@ -2,7 +2,9 @@ package com.seepine.http.util;
 
 import com.seepine.http.entity.StreamProgress;
 import com.seepine.http.exception.IoRuntimeException;
+
 import java.io.*;
+
 /**
  * @author Seepine
  */
@@ -49,11 +51,14 @@ public class FileUtil {
             throw new IllegalArgumentException("ill file path");
         }
         if (!file.exists()) {
-            mkParentDirs(file);
-            try {
-                file.createNewFile();
-            } catch (Exception e) {
-                throw new IoRuntimeException(e);
+            if (mkParentDirs(file) != null) {
+                try {
+                    if (!file.createNewFile()) {
+                        throw new IllegalArgumentException("ill create new file");
+                    }
+                } catch (Exception e) {
+                    throw new IoRuntimeException(e);
+                }
             }
         }
         return file;
@@ -79,6 +84,7 @@ public class FileUtil {
      * 异步模式下直接读取Http流写出，同步模式下将存储在内存中的响应内容写出<br>
      * 写出后会关闭Http流（异步模式）
      *
+     * @param in           in
      * @param destFilePath 写出到的文件的路径
      * @return 写出bytes数
      * @since 3.3.2
@@ -92,6 +98,7 @@ public class FileUtil {
      * 异步模式下直接读取Http流写出，同步模式下将存储在内存中的响应内容写出<br>
      * 写出后会关闭Http流（异步模式）
      *
+     * @param in       in
      * @param destFile 写出到的文件
      * @return 写出bytes数
      * @since 3.3.2
@@ -100,10 +107,22 @@ public class FileUtil {
         return writeBody(in, destFile, null);
     }
 
+    /**
+     * @param in             in
+     * @param filePath       filePath
+     * @param streamProgress streamProgress
+     * @return long
+     */
     public static long writeBody(InputStream in, String filePath, StreamProgress streamProgress) {
         return writeBody(in, FileUtil.touch(filePath), streamProgress);
     }
 
+    /**
+     * @param in             in
+     * @param destFile       in
+     * @param streamProgress streamProgress
+     * @return long
+     */
     public static long writeBody(InputStream in, File destFile, StreamProgress streamProgress) {
         if (null == destFile) {
             throw new NullPointerException("[destFile] is null!");
@@ -114,12 +133,19 @@ public class FileUtil {
         return writeBody(in, FileUtil.getOutputStream(destFile), true, streamProgress);
     }
 
+    /**
+     * @param in             in
+     * @param out            out
+     * @param isCloseOut     isCloseOut
+     * @param streamProgress streamProgress
+     * @return long
+     */
     public static long writeBody(InputStream in, OutputStream out, boolean isCloseOut, StreamProgress streamProgress) {
         if (null == out) {
             throw new NullPointerException("[out] is null!");
         }
         try {
-            return IoUtil.copyByNIO(in, out, IoUtil.DEFAULT_BUFFER_SIZE, streamProgress);
+            return IoUtil.copyByNio(in, out, IoUtil.DEFAULT_BUFFER_SIZE, streamProgress);
         } finally {
             if (isCloseOut) {
                 IoUtil.close(out);

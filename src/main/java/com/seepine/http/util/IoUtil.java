@@ -29,13 +29,10 @@ public class IoUtil {
      * 默认大缓存大小 32768
      */
     public static final int DEFAULT_LARGE_BUFFER_SIZE = 2 << 14;
-
     /**
      * 数据流末尾
      */
     public static final int EOF = -1;
-
-    // -------------------------------------------------------------------------------------- Copy start
 
     /**
      * 将Reader中的内容复制到Writer中 使用默认缓存大小，拷贝后不关闭Reader
@@ -173,14 +170,21 @@ public class IoUtil {
      * @return 传输的byte数
      * @throws IoRuntimeException IO异常
      */
-    public static long copyByNIO(InputStream in, OutputStream out, int bufferSize, StreamProgress streamProgress) throws IoRuntimeException {
+    public static long copyByNio(InputStream in, OutputStream out, int bufferSize, StreamProgress streamProgress) throws IoRuntimeException {
         return copy(Channels.newChannel(in), Channels.newChannel(out), bufferSize, streamProgress);
     }
+
+    /**
+     * @param input input
+     * @return byte[]
+     * @throws IOException IOException
+     */
     public static byte[] toByteArray(InputStream input) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        copy((InputStream)input, (OutputStream)output);
+        copy((InputStream) input, (OutputStream) output);
         return output.toByteArray();
     }
+
     /**
      * 拷贝文件流，使用NIO
      *
@@ -271,9 +275,6 @@ public class IoUtil {
 
         return size;
     }
-    // -------------------------------------------------------------------------------------- Copy end
-
-    // -------------------------------------------------------------------------------------- getReader and getWriter start
 
     /**
      * 获得一个文件读取器，默认使用UTF-8编码
@@ -388,36 +389,34 @@ public class IoUtil {
             return new OutputStreamWriter(out, charset);
         }
     }
-    // -------------------------------------------------------------------------------------- getReader and getWriter end
-/**
-	 * 关闭<br>
-	 * 关闭失败不会抛出异常
-	 *
-	 * @param closeable 被关闭的对象
-	 */
-	public static void close(Closeable closeable) {
-		if (null != closeable) {
-			try {
-				closeable.close();
-			} catch (Exception e) {
-				// 静默关闭
-			}
-		}
-	}
+    /**
+     * 关闭<br>
+     * 关闭失败不会抛出异常
+     *
+     * @param closeable 被关闭的对象
+     */
+    public static void close(Closeable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                // 静默关闭
+            }
+        }
+    }
 
-	/**
-	 * 关闭<br>
-	 * 关闭失败不会抛出异常
-	 *
-	 * @param closeable 被关闭的对象
-	 */
-	public static void close(AutoCloseable closeable) {
-		if (null != closeable) {
-			try {
-				closeable.close();
-			} catch (Exception e) {
-				// 静默关闭
-			}
-		}
-	}
+    /**
+     * 关闭<br>
+     * 关闭失败不会抛出异常
+     *
+     * @param closeable 被关闭的对象
+     */
+    public static void close(AutoCloseable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+            }
+        }
+    }
 }

@@ -42,14 +42,14 @@ public class EasyHttpClient {
         }
     }
 
-    private CloseableHttpClient getHttpClient(String url) {
-        String domain = UrlUtil.getDomain(url);
+    private CloseableHttpClient getHttpClient(Request request) {
+        String domain = UrlUtil.getDomain(request.getUrl());
         CloseableHttpClient httpClient = httpClientMap.get(domain);
         if (httpClient == null) {
             synchronized (this) {
                 httpClient = httpClientMap.get(domain);
                 if (httpClient == null) {
-                    httpClient = httpClientGenerator.getClient();
+                    httpClient = httpClientGenerator.getClient(request);
                     httpClientMap.put(domain, httpClient);
                 }
             }
@@ -59,8 +59,8 @@ public class EasyHttpClient {
 
     public Response execute(Request request) throws IOException {
         CloseableHttpResponse httpResponse;
-        CloseableHttpClient httpClient = getHttpClient(request.getUrl());
-        Response res = null;
+        CloseableHttpClient httpClient = getHttpClient(request);
+        Response res;
         Proxy proxy = proxyProvider.getProxy();
         httpResponse = httpClient.execute(HttpUriRequestConverter.convertHttpUriRequest(request, proxy), HttpUriRequestConverter.convertHttpClientContext(proxy));
         res = handleResponse(request, request.charset() != null ? request.charset() : request.charset(), httpResponse);
@@ -95,7 +95,6 @@ public class EasyHttpClient {
             res.setBody(new String(bytes, charset));
             res.setBodyBytes(bytes);
         }
-        // System.out.println(StrUtil.CRLF+"Status Code:" + res.getStatus() + StrUtil.CRLF);
         return res;
     }
 

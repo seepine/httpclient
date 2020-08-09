@@ -67,7 +67,6 @@ public class ArrayUtil {
         if (null == obj) {
             return null;
         }
-
         if (obj instanceof long[]) {
             return Arrays.toString((long[]) obj);
         } else if (obj instanceof int[]) {
@@ -85,11 +84,9 @@ public class ArrayUtil {
         } else if (obj instanceof double[]) {
             return Arrays.toString((double[]) obj);
         } else if (ArrayUtil.isArray(obj)) {
-            // 对象数组
             try {
                 return Arrays.deepToString((Object[]) obj);
             } catch (Exception ignore) {
-                //ignore
             }
         }
         return obj.toString();

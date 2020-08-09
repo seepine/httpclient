@@ -1,5 +1,6 @@
 package com.seepine.http.client;
 
+import com.seepine.http.entity.Request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -22,13 +23,12 @@ import java.security.cert.X509Certificate;
  */
 @Slf4j
 public class HttpClientGenerator {
-
     private final PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
 
     public HttpClientGenerator() {
         Registry<ConnectionSocketFactory> reg = RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("http", PlainConnectionSocketFactory.INSTANCE)
-                .register("https", buildSSLConnectionSocketFactory())
+                .register("https", buildSslConnectionSocketFactory())
                 .build();
         poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager(reg);
         //每次能接收的请求
@@ -36,9 +36,9 @@ public class HttpClientGenerator {
         poolingHttpClientConnectionManager.setMaxTotal(200);
     }
 
-    private SSLConnectionSocketFactory buildSSLConnectionSocketFactory() {
+    private SSLConnectionSocketFactory buildSslConnectionSocketFactory() {
         try {
-            return new SSLConnectionSocketFactory(createIgnoreVerifySSL(), new String[]{"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"},
+            return new SSLConnectionSocketFactory(createIgnoreVerifySsl(), new String[]{"SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"},
                     null,
                     // 优先绕过安全证书
                     (s, sslSession) -> true);
@@ -48,7 +48,7 @@ public class HttpClientGenerator {
         return SSLConnectionSocketFactory.getSocketFactory();
     }
 
-    private SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
+    private SSLContext createIgnoreVerifySsl() throws NoSuchAlgorithmException, KeyManagementException {
         // 实现一个X509TrustManager接口，用于绕过验证，不用修改里面的方法
         SSLContext sc = SSLContext.getInstance("SSL");
         sc.init(null, new TrustManager[]{new X509TrustManager() {
@@ -73,24 +73,21 @@ public class HttpClientGenerator {
         return this;
     }
 
-    public CloseableHttpClient getClient() {
-        return generateClient();
+    public CloseableHttpClient getClient(Request request) {
+        return generateClient(request);
     }
 
-    private CloseableHttpClient generateClient() {
+    private CloseableHttpClient generateClient(Request request) {
         HttpClientBuilder httpClientBuilder = HttpClients.custom();
         httpClientBuilder.setConnectionManager(poolingHttpClientConnectionManager);
-
-        //解决post/redirect/post 302跳转问题
         httpClientBuilder.setRedirectStrategy(new CustomRedirectStrategy());
-
         SocketConfig.Builder socketConfigBuilder = SocketConfig.custom();
         socketConfigBuilder.setSoKeepAlive(true).setTcpNoDelay(true);
-        // socketConfigBuilder.setSoTimeout(site.getTimeOut());
         SocketConfig socketConfig = socketConfigBuilder.build();
+        socketConfigBuilder.setSoTimeout(request.getTimeOut());
         httpClientBuilder.setDefaultSocketConfig(socketConfig);
         poolingHttpClientConnectionManager.setDefaultSocketConfig(socketConfig);
-        // httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(site.getRetryTimes(), true));
+        httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(request.getRetryTimes(), true));
         return httpClientBuilder.build();
     }
 

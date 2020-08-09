@@ -1,5 +1,3 @@
-package com.seepine.http;
-
 import com.seepine.http.entity.Request;
 import com.seepine.http.entity.StreamProgress;
 import com.seepine.http.util.HttpUtil;
@@ -14,7 +12,7 @@ import java.util.Map;
 /**
  * @author Seepine
  */
-public class Main {
+public class MainTest {
     public static void main(String[] args) throws IOException {
         testDownload();
         testGet();

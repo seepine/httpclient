@@ -1,5 +1,7 @@
 package com.seepine.http.proxy;
 
+import java.util.Objects;
+
 /**
  * @author Seepine
  */
@@ -40,15 +42,25 @@ public class Proxy {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Proxy proxy = (Proxy) o;
 
-        if (port != proxy.port) return false;
-        if (host != null ? !host.equals(proxy.host) : proxy.host != null) return false;
-        if (username != null ? !username.equals(proxy.username) : proxy.username != null) return false;
-        return password != null ? password.equals(proxy.password) : proxy.password == null;
+        if (port != proxy.port) {
+            return false;
+        }
+        if (!Objects.equals(host, proxy.host)) {
+            return false;
+        }
+        if (!Objects.equals(username, proxy.username)) {
+            return false;
+        }
+        return Objects.equals(password, proxy.password);
     }
 
     @Override
