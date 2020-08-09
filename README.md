@@ -16,9 +16,9 @@ httpclient封装，线程池、代理、HttpUtil
 ### 1.简单请求
 ```java
 String res = HttpUtil.get("http://127.0.0.1:8080/get");
-String res = HttpUtil.post("http://127.0.0.1:8080/post",new HashMap<String,Object>);
+String res = HttpUtil.post("http://127.0.0.1:8080/post",new HashMap<String,Object>());
 String res = HttpUtil.postJson("http://127.0.0.1:8080/post",jsonStr);
-String res = HttpUtil.put("http://127.0.0.1:8080/put",new HashMap<String,Object>);
+String res = HttpUtil.put("http://127.0.0.1:8080/put",new HashMap<String,Object>());
 String res = HttpUtil.delete("http://127.0.0.1:8080/delete");
 ```
 ### 2.文件下载
